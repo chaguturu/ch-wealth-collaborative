@@ -1,0 +1,33 @@
+{
+  "name": "CH Wealth Collaborative",
+  "short_name": "CH Wealth",
+  "description": "Private household wealth management for the Chaguturu-Hardin family",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0B0F1C",
+  "theme_color": "#0B0F1C",
+  "scope": "/",
+  "lang": "en-US",
+  "icons": [
+    { "src": "/icon-16.png", "sizes": "16x16", "type": "image/png" },
+    { "src": "/icon-32.png", "sizes": "32x32", "type": "image/png" },
+    { "src": "/icon-180.png", "sizes": "180x180", "type": "image/png", "purpose": "apple touch icon" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Net Worth",
+      "short_name": "Net Worth",
+      "url": "/dashboard",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Equity Comp",
+      "short_name": "Equity",
+      "url": "/equity",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
