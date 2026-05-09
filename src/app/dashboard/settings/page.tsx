@@ -1,20 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-const C = {
-  bg: "#0b0f1c",
-  panel: "#111827",
-  border: "#1e2d4a",
-  accent: "#c94a00",
-  green: "#3db87a",
-  gold: "#e8b84b",
-  blue: "#5b9bd5",
-  text: "#e8dfc8",
-  muted: "#7a8fa8",
-  dim: "#3a4a60",
-  dark: "#0d1525",
-};
+import PageHeader from "@/components/PageHeader";
+import { C } from "@/lib/tokens";
 
 const S: Record<string, React.CSSProperties> = {
   page: { padding: "24px 20px", fontFamily: "Georgia, serif", color: C.text, maxWidth: 900, margin: "0 auto" },
@@ -236,8 +224,11 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div style={{ ...S.page, color: C.muted, paddingTop: 60, textAlign: "center" }}>
-        Loading...
+      <div style={{ fontFamily: "Georgia, serif", background: C.bg, minHeight: "100vh" }}>
+        <PageHeader eyebrow="Account & Privacy" title="Settings" subtitle="Chaguturu-Hardin Household" />
+        <div style={{ ...S.page, color: C.muted, paddingTop: 40, textAlign: "center" }}>
+          Loading...
+        </div>
       </div>
     );
   }
@@ -260,9 +251,9 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div style={S.page}>
-      <h1 style={S.heading}>Settings</h1>
-      <p style={S.sub}>Household: Chaguturu-Hardin</p>
+    <div style={{ fontFamily: "Georgia, serif", background: C.bg, minHeight: "100vh", color: C.text }}>
+      <PageHeader eyebrow="Account & Privacy" title="Settings" subtitle="Chaguturu-Hardin Household" />
+      <div style={S.page}>
 
       {/* Tab bar */}
       <div style={{ display: "flex", gap: 4, marginBottom: 24, borderBottom: `1px solid ${C.border}`, paddingBottom: 0 }}>
@@ -433,6 +424,7 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

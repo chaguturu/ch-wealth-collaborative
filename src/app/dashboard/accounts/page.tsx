@@ -1,22 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useCallback as useC } from "react";
 import PlaidLinkButton from "@/components/PlaidLinkButton";
-
-const C = {
-  bg: "#0b0f1c",
-  panel: "#111827",
-  border: "#1e2d4a",
-  accent: "#c94a00",
-  green: "#3db87a",
-  gold: "#e8b84b",
-  blue: "#5b9bd5",
-  text: "#e8dfc8",
-  muted: "#7a8fa8",
-  dim: "#3a4a60",
-  dark: "#0d1525",
-};
+import PageHeader from "@/components/PageHeader";
+import { SkeletonLine, SkeletonCard, SkeletonPage } from "@/components/Skeleton";
+import { C } from "@/lib/tokens";
 
 function fmtUSD(n: number | null) {
   if (n == null) return "--";
@@ -253,24 +241,22 @@ export default function AccountsPage() {
 
   return (
     <div style={{ fontFamily: "Georgia, serif", background: C.bg, minHeight: "100vh", color: C.text }}>
-      <div style={{ background: "linear-gradient(135deg, #0b0f1c 0%, #132040 100%)", borderBottom: "1px solid " + C.accent, padding: "20px 24px" }}>
-        <div style={{ fontSize: 10, letterSpacing: "0.3em", color: C.accent, textTransform: "uppercase" as const, marginBottom: 4 }}>
-          Connected via Plaid
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap" as const, gap: 12 }}>
-          <div style={{ fontSize: 26, fontWeight: 700, color: C.text }}>Accounts</div>
-          <div style={{ display: "flex", gap: 8 }}>
+      <PageHeader
+        eyebrow="Connected via Plaid"
+        title="Accounts"
+        right={
+          <>
             <button
               onClick={handleSync}
               disabled={syncing}
-              style={{ background: C.dark, border: "1px solid " + C.border, borderRadius: 6, color: syncing ? C.dim : C.muted, padding: "8px 14px", cursor: syncing ? "not-allowed" : "pointer", fontSize: 12, fontFamily: "Georgia, serif" }}
+              style={{ background: C.dark, border: `1px solid ${C.border}`, borderRadius: 6, color: syncing ? C.dim : C.muted, padding: "8px 14px", cursor: syncing ? "not-allowed" : "pointer", fontSize: 12, fontFamily: "Georgia, serif" }}
             >
               {syncing ? "Syncing..." : "Refresh Balances"}
             </button>
             <PlaidLinkButton onSuccess={load} />
-          </div>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {error && <div style={{ padding: 20, color: C.accent, fontSize: 14 }}>{error}</div>}
 
@@ -377,9 +363,17 @@ export default function AccountsPage() {
       )}
 
       {loading && (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 300, color: C.muted, fontSize: 14 }}>
-          Loading accounts...
-        </div>
+        <SkeletonPage>
+          <div style={{ padding: "20px 24px" }}>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 24 }}>
+              <SkeletonCard /><SkeletonCard /><SkeletonCard />
+            </div>
+            <div style={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 8, padding: 20 }}>
+              <SkeletonLine width="30%" height={10} mb={16} />
+              {[1, 2, 3, 4].map((i) => <SkeletonLine key={i} height={44} mb={8} borderRadius={6} />)}
+            </div>
+          </div>
+        </SkeletonPage>
       )}
     </div>
   );

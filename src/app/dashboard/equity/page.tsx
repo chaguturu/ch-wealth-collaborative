@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import type { EquityData, PsuSliders } from "@/types/equity";
+import { C } from "@/lib/tokens";
 import SummaryTab from "@/components/equity/SummaryTab";
 import VestDetailTab from "@/components/equity/VestDetailTab";
 import OptionsTab from "@/components/equity/OptionsTab";
@@ -11,18 +12,6 @@ import TaxStackingTab from "@/components/equity/TaxStackingTab";
 import EquityScenariosTab from "@/components/equity/EquityScenariosTab";
 import ConcentrationTab from "@/components/equity/ConcentrationTab";
 
-const C = {
-  bg: "#0b0f1c",
-  panel: "#111827",
-  border: "#1e2d4a",
-  accent: "#c94a00",
-  green: "#3db87a",
-  gold: "#e8b84b",
-  text: "#e8dfc8",
-  muted: "#7a8fa8",
-  dim: "#3a4a60",
-  dark: "#0d1525",
-};
 
 const TABS = [
   { id: "summary",       label: "Summary" },
