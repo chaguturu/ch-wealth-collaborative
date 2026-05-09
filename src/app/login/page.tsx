@@ -4,7 +4,7 @@ import { auth0 } from "@/lib/auth0";
 function LoginButton() {
   return (
     <a
-      href="/api/auth/login"
+      href="/auth/login"
       style={{
         display: "inline-flex",
         alignItems: "center",
