@@ -38,13 +38,14 @@ export async function validateSession(req: NextRequest): Promise<
 
 type AuthedHandler = (
   req: NextRequest,
-  auth: { session: SessionData; userId: string }
+  auth: { session: SessionData; userId: string },
+  ctx?: unknown
 ) => Promise<NextResponse>;
 
 export function withAuth(handler: AuthedHandler) {
-  return async function authedRoute(req: NextRequest): Promise<NextResponse> {
+  return async function authedRoute(req: NextRequest, ctx?: unknown): Promise<NextResponse> {
     const result = await validateSession(req);
     if (result instanceof NextResponse) return result;
-    return handler(req, result);
+    return handler(req, result, ctx);
   };
 }
