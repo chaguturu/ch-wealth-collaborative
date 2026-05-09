@@ -1,14 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ReferenceLine, ResponsiveContainer } from "recharts";
-
-const C = {
-  bg: "#0b0f1c", panel: "#111827", border: "#1e2d4a",
-  accent: "#c94a00", green: "#3db87a", gold: "#e8b84b",
-  blue: "#5b9bd5", text: "#e8dfc8", muted: "#7a8fa8",
-  dim: "#3a4a60", dark: "#0d1525",
-};
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ReferenceLine, ResponsiveContainer } from "recharts";
+import { C } from "@/lib/tokens";
+import { SkeletonLine, SkeletonPage } from "@/components/Skeleton";
 
 function fmtUSD(n: number) {
   if (Math.abs(n) >= 1_000_000) return "$" + (n / 1_000_000).toFixed(1) + "M";
@@ -136,31 +131,37 @@ function EventCard({ ev, onDelete }: { ev: ScenarioEvent; onDelete: () => void }
   const color = EVENT_TYPE_COLOR[ev.event_type] ?? C.muted;
   const param = Object.entries(ev.parameters)[0];
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: 12, padding: "12px 0", borderBottom: "1px solid " + C.dark }}>
-      <div style={{ width: 3, alignSelf: "stretch", background: color, borderRadius: 2, flexShrink: 0 }} />
-      <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{ev.label}</div>
-        <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>
-          {shortDate(ev.event_date)}
-          {ev.end_date && " - " + shortDate(ev.end_date)}
-          <span style={{ marginLeft: 8, background: color + "22", color, padding: "1px 6px", borderRadius: 3, fontSize: 10 }}>
+    <div style={{
+      display: "flex", alignItems: "flex-start", gap: 0,
+      background: C.dark, borderRadius: 6, marginBottom: 6, overflow: "hidden",
+      border: `1px solid ${C.border}`,
+    }}>
+      <div style={{ width: 4, alignSelf: "stretch", background: color, flexShrink: 0 }} />
+      <div style={{ flex: 1, padding: "10px 12px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+          <div style={{ fontSize: 13, color: C.text, fontWeight: 600 }}>{ev.label}</div>
+          <button
+            onClick={onDelete}
+            style={{ background: "transparent", border: "none", color: C.dim, cursor: "pointer", fontSize: 16, padding: "0 2px", lineHeight: 1, flexShrink: 0 }}
+            title="Remove event"
+          >
+            &times;
+          </button>
+        </div>
+        <div style={{ fontSize: 11, color: C.muted, marginTop: 3, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <span>{shortDate(ev.event_date)}{ev.end_date ? " - " + shortDate(ev.end_date) : ""}</span>
+          <span style={{ background: color + "22", color, padding: "1px 7px", borderRadius: 10, fontSize: 10, fontWeight: 600 }}>
             {EVENT_TYPE_LABEL[ev.event_type]}
           </span>
+          {param && (
+            <span style={{ color: C.dim }}>
+              {typeof param[1] === "number" && param[0] !== "portfolio_pct_change"
+                ? fmtFull(param[1])
+                : param[1] + (param[0] === "portfolio_pct_change" ? "%" : "")}
+            </span>
+          )}
         </div>
-        {param && (
-          <div style={{ fontSize: 11, color: C.dim, marginTop: 3 }}>
-            {param[0].replace(/_/g, " ")}: {typeof param[1] === "number" && param[0] !== "portfolio_pct_change"
-              ? fmtFull(param[1])
-              : param[1] + (param[0] === "portfolio_pct_change" ? "%" : "")}
-          </div>
-        )}
       </div>
-      <button
-        onClick={onDelete}
-        style={{ background: "transparent", border: "none", color: C.dim, cursor: "pointer", fontSize: 16, padding: "2px 6px", lineHeight: 1 }}
-      >
-        x
-      </button>
     </div>
   );
 }
@@ -361,44 +362,56 @@ export default function ScenariosPage() {
       </div>
 
       {loading ? (
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: 300, color: C.muted, fontSize: 14 }}>
-          Loading...
-        </div>
+        <SkeletonPage>
+          <div style={{ padding: "20px 24px", display: "grid", gridTemplateColumns: "260px 1fr", gap: 20 }}>
+            <div>
+              {[1, 2, 3].map((i) => <SkeletonLine key={i} height={52} mb={8} borderRadius={6} />)}
+            </div>
+            <div>
+              <SkeletonLine height={260} mb={20} borderRadius={8} />
+              <SkeletonLine height={120} borderRadius={8} />
+            </div>
+          </div>
+        </SkeletonPage>
       ) : (
         <div style={{ padding: "20px 24px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "220px 1fr", gap: 20 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "260px 1fr", gap: 20 }}>
 
             {/* Scenario list */}
             <div>
               <div style={{ fontSize: 10, letterSpacing: "0.2em", textTransform: "uppercase" as const, color: C.muted, marginBottom: 12 }}>Scenarios</div>
-              {scenarios.map((s) => (
-                <div
-                  key={s.id}
-                  onClick={() => setActiveId(s.id)}
-                  style={{
-                    background: activeId === s.id ? "#1a2640" : C.panel,
-                    border: "1px solid " + (activeId === s.id ? C.blue : C.border),
-                    borderLeft: "3px solid " + (activeId === s.id ? C.blue : "transparent"),
-                    borderRadius: 6, padding: "10px 12px", marginBottom: 8, cursor: "pointer",
-                    display: "flex", justifyContent: "space-between", alignItems: "center",
-                  }}
-                >
-                  <div>
-                    <div style={{ fontSize: 13, color: activeId === s.id ? C.text : C.muted, fontWeight: activeId === s.id ? 600 : 400 }}>
-                      {s.name}
+              {scenarios.map((s) => {
+                const active = activeId === s.id;
+                return (
+                  <div
+                    key={s.id}
+                    onClick={() => setActiveId(s.id)}
+                    style={{
+                      background: active ? "#192338" : C.panel,
+                      border: `1px solid ${active ? C.blue : C.border}`,
+                      borderLeft: `3px solid ${active ? C.gold : "transparent"}`,
+                      borderRadius: 6, padding: "11px 12px", marginBottom: 6, cursor: "pointer",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <div style={{ fontSize: 13, color: active ? C.text : C.muted, fontWeight: active ? 700 : 400 }}>
+                        {s.name}
+                      </div>
+                      {!s.is_baseline && scenarios.length > 1 && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); deleteScenario(s.id); }}
+                          style={{ background: "transparent", border: "none", color: C.dim, cursor: "pointer", fontSize: 16, padding: "0 3px", lineHeight: 1 }}
+                        >
+                          &times;
+                        </button>
+                      )}
                     </div>
-                    {s.is_baseline && <div style={{ fontSize: 10, color: C.dim, marginTop: 2 }}>baseline</div>}
+                    {s.is_baseline && (
+                      <div style={{ fontSize: 10, color: C.dim, marginTop: 2, letterSpacing: "0.05em" }}>BASELINE</div>
+                    )}
                   </div>
-                  {!s.is_baseline && scenarios.length > 1 && (
-                    <button
-                      onClick={(e) => { e.stopPropagation(); deleteScenario(s.id); }}
-                      style={{ background: "transparent", border: "none", color: C.dim, cursor: "pointer", fontSize: 14, padding: "0 2px" }}
-                    >
-                      x
-                    </button>
-                  )}
-                </div>
-              ))}
+                );
+              })}
 
               {showNewForm ? (
                 <div style={{ marginTop: 8 }}>
@@ -454,12 +467,18 @@ export default function ScenariosPage() {
                       </div>
                     </div>
                     <ResponsiveContainer width="100%" height={220}>
-                      <LineChart data={projData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                      <AreaChart data={projData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="projGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%"  stopColor={C.green} stopOpacity={0.2} />
+                            <stop offset="95%" stopColor={C.green} stopOpacity={0}   />
+                          </linearGradient>
+                        </defs>
                         <XAxis dataKey="year" tick={{ fill: C.muted, fontSize: 11 }} axisLine={false} tickLine={false} />
                         <YAxis hide />
                         <Tooltip
                           formatter={(v) => [fmtFull(v as number), "Net Worth"]}
-                          contentStyle={{ background: C.panel, border: "1px solid " + C.border, borderRadius: 6, fontSize: 12 }}
+                          contentStyle={{ background: C.panel, border: `1px solid ${C.border}`, borderRadius: 6, fontSize: 12, fontFamily: "Georgia, serif" }}
                           labelStyle={{ color: C.text }}
                           itemStyle={{ color: C.green }}
                           labelFormatter={(l) => String(l)}
@@ -473,12 +492,21 @@ export default function ScenariosPage() {
                               x={yr}
                               stroke={EVENT_TYPE_COLOR[ev.event_type] ?? C.dim}
                               strokeDasharray="3 3"
-                              strokeOpacity={0.6}
+                              strokeOpacity={0.7}
+                              label={{ value: ev.label.slice(0, 12), position: "top", fill: EVENT_TYPE_COLOR[ev.event_type] ?? C.dim, fontSize: 9 }}
                             />
                           );
                         })}
-                        <Line type="monotone" dataKey="netWorth" stroke={C.green} strokeWidth={2.5} dot={false} />
-                      </LineChart>
+                        <Area
+                          type="monotone"
+                          dataKey="netWorth"
+                          stroke={C.green}
+                          strokeWidth={2.5}
+                          fill="url(#projGradient)"
+                          dot={false}
+                          activeDot={{ r: 4, fill: C.green, stroke: C.panel, strokeWidth: 2 }}
+                        />
+                      </AreaChart>
                     </ResponsiveContainer>
                     <div style={{ display: "flex", gap: 12, marginTop: 8, flexWrap: "wrap" as const }}>
                       {projData.filter((_, i) => i % 2 === 1 || i === projData.length - 1).map((d) => (
