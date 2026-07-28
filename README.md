@@ -1,5 +1,37 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## ISEE Vocabulary trainer (`/vocab`)
+
+A standalone study tool at `/vocab`. No login, no API calls, no database: the word
+list ships with the bundle and progress lives in `localStorage` on the device, so
+the page is statically prerendered and works offline once loaded.
+
+- **212 words** across the three ISEE levels: Lower (grades 5-6), Middle (7-8),
+  Upper (9-12). Each entry has a definition, part of speech, synonyms, antonyms,
+  and an example sentence.
+- **Three drills**: flashcards with self-grading, a meaning quiz (closest synonym
+  or definition), and sentence completion (fill in the blank).
+- **Leitner scheduling**: a word moves up a box when answered correctly and drops
+  to box 1 when missed. Boxes come back after 1, 2, 4, 8, and 21 days. "Smart
+  review" builds a session from what is due, weakest words first, interleaved
+  with new ones.
+- Word list with search and filters, starring, day streak, and a daily goal.
+
+Source layout:
+
+| Path | Purpose |
+| --- | --- |
+| `src/data/vocab/` | Word lists, one file per level, plus sentence helpers |
+| `src/lib/vocab/progress.ts` | Leitner boxes, streaks, stats, persistence |
+| `src/lib/vocab/session.ts` | Deck building and multiple-choice generation |
+| `src/components/vocab/` | Screens (home, flashcards, quiz, word list, results) |
+
+To add words, append entries to the relevant file in `src/data/vocab/`. Mark the
+target word form in the example sentence with `[brackets]`; that one annotation
+drives both the highlighted example and the sentence-completion blank. Wrong
+answers are generated at runtime from other words in the same level, skipping any
+that share meaning with the prompt.
+
 ## Getting Started
 
 First, run the development server:
